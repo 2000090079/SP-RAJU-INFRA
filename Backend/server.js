@@ -22,10 +22,23 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 /* ==============================
+   CORS (FIXED FOR DOMAIN)
+================================ */
+
+app.use(cors({
+  origin: [
+    "https://www.sprajuinfra.com",
+    "https://sprajuinfra.com",
+    "http://localhost:5173"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}))
+
+/* ==============================
    MIDDLEWARE
 ================================ */
 
-app.use(cors())
 app.use(express.json())
 
 /* ==============================
@@ -43,7 +56,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS
   },
   tls: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false   // ✅ FIXED SMTP ERROR
   }
 })
 
@@ -64,12 +77,8 @@ if (!process.env.MONGO_URI) {
 }
 
 mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-  console.log("✅ MongoDB Connected Successfully")
-})
-.catch((err) => {
-  console.error("❌ MongoDB Connection Error:", err)
-})
+.then(() => console.log("✅ MongoDB Connected Successfully"))
+.catch((err) => console.error("❌ MongoDB Connection Error:", err))
 
 /* ==============================
    DATABASE STATUS CHECK
@@ -135,10 +144,11 @@ app.post("/send-enquiry", async (req, res) => {
 
   try {
 
+    // Send to admin
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
-      subject: "SP Raju Infra - New Enquiry",
+      subject: "📩 New Enquiry - SP Raju Infra",
       html: `
         <h3>New Enquiry Received</h3>
         <p><b>Name:</b> ${name}</p>
@@ -147,7 +157,9 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
+    // Auto reply to user
     await transporter.sendMail({
+      from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "We received your enquiry - SP Raju Infra",
       html: `
