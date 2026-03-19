@@ -11,7 +11,7 @@ const handleLogin = (e)=>{
 
 e.preventDefault()
 
-if(password === "admin123"){
+if(password === "Sp@rajuinfra"){
 
 localStorage.setItem("admin","true")
 navigate("/sprajuco-dashboard")

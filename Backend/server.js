@@ -29,20 +29,24 @@ app.use(cors())
 app.use(express.json())
 
 /* ==============================
-   EMAIL CONFIG
+   EMAIL CONFIG (FIXED)
 ================================ */
 
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  console.error("❌ EMAIL_USER or EMAIL_PASS missing in .env")
+}
+
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 })
 
-/* VERIFY CONNECTION */
 transporter.verify((error) => {
   if (error) {
     console.log("❌ SMTP Error:", error)
@@ -52,13 +56,14 @@ transporter.verify((error) => {
 })
 
 /* ==============================
-   MONGODB CONNECTION (FIXED)
+   MONGODB CONNECTION
 ================================ */
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+if (!process.env.MONGO_URI) {
+  console.error("❌ MONGO_URI missing in .env")
+}
+
+mongoose.connect(process.env.MONGO_URI)
 .then(() => {
   console.log("✅ MongoDB Connected Successfully")
 })
@@ -99,24 +104,37 @@ app.use("/uploads", express.static(uploadDir))
 app.use("/projects", projectRoutes)
 
 /* ==============================
+   🔐 ADMIN LOGIN
+================================ */
+
+app.post("/admin-login", (req, res) => {
+  const { password } = req.body
+
+  if (!password) {
+    return res.status(400).json({ success: false, message: "Password required" })
+  }
+
+  if (password === process.env.ADMIN_PASSWORD) {
+    return res.json({ success: true })
+  }
+
+  res.status(401).json({ success: false, message: "Invalid password" })
+})
+
+/* ==============================
    CONTACT FORM - SEND EMAIL
 ================================ */
 
 app.post("/send-enquiry", async (req, res) => {
 
-  console.log("🔥 send-enquiry route hit")
-  console.log("📩 Request body:", req.body)
-
   const { name, email, message } = req.body
 
-  /* VALIDATION */
   if (!name || !email || !message) {
     return res.status(400).json({ message: "All fields are required" })
   }
 
   try {
 
-    /* SEND MAIL TO YOU */
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_USER,
@@ -129,7 +147,6 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
-    /* AUTO REPLY TO USER */
     await transporter.sendMail({
       to: email,
       subject: "We received your enquiry - SP Raju Infra",
@@ -141,8 +158,6 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
-    console.log("✅ Email sent successfully")
-
     res.status(200).json({ message: "Enquiry sent successfully" })
 
   } catch (err) {
@@ -153,7 +168,7 @@ app.post("/send-enquiry", async (req, res) => {
 })
 
 /* ==============================
-   SERVER START (FIXED)
+   SERVER START
 ================================ */
 
 const PORT = process.env.PORT || 5000
