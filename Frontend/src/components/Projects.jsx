@@ -170,7 +170,7 @@ View More Projects
 )}
 
 
-/* PROJECT MODAL */
+{/* PROJECT MODAL */}
 
 {selectedProject && (
 
