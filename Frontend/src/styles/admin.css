@@ -1,0 +1,255 @@
+/* MAIN WRAPPER */
+
+.admin-wrapper{
+background:#f5f7fa;
+min-height:100vh;
+padding:60px 20px;
+}
+
+/* TITLE */
+
+.admin-title{
+font-size:36px;
+font-weight:600;
+color:#2c3e50;
+margin-bottom:40px;
+text-align:center;
+}
+
+/* GRID */
+
+.admin-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+align-items:start;
+max-width:1200px;
+margin:auto;
+}
+
+/* FORM CARD */
+
+.admin-form-card{
+background:white;
+padding:35px;
+border-radius:12px;
+box-shadow:0 12px 30px rgba(0,0,0,0.08);
+transition:0.25s;
+}
+
+.admin-form-card:hover{
+transform:translateY(-3px);
+}
+
+.admin-form-card h2{
+margin-bottom:20px;
+font-size:22px;
+}
+
+/* FORM */
+
+.admin-form-card form{
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.admin-form-card input,
+.admin-form-card textarea,
+.admin-form-card select{
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+font-size:14px;
+outline:none;
+}
+
+.admin-form-card textarea{
+min-height:120px;
+}
+
+/* BUTTON */
+
+.admin-form-card button{
+background:#2c3e50;
+color:white;
+border:none;
+padding:14px;
+border-radius:8px;
+font-weight:500;
+cursor:pointer;
+transition:0.25s;
+}
+
+.admin-form-card button:hover{
+background:#1a252f;
+transform:scale(1.03);
+}
+
+/* BHK BOXES */
+
+.bhk-boxes{
+display:flex;
+gap:10px;
+margin-bottom:10px;
+flex-wrap:wrap;
+}
+
+.bhk-box{
+padding:8px 14px;
+border:2px solid #ccc;
+border-radius:6px;
+cursor:pointer;
+font-weight:600;
+transition:0.2s;
+}
+
+.bhk-box:hover{
+border-color:#1B263B;
+}
+
+.bhk-box.active{
+background:#1B263B;
+color:white;
+border-color:#1B263B;
+}
+
+/* PROJECT LIST */
+
+.admin-projects{
+background:white;
+padding:35px;
+border-radius:12px;
+box-shadow:0 12px 30px rgba(0,0,0,0.08);
+}
+
+.admin-projects h2{
+margin-bottom:20px;
+}
+
+/* PROJECT CARD */
+
+.admin-project-card{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+border-radius:8px;
+margin-bottom:12px;
+background:#f8f9fb;
+transition:0.2s;
+gap:15px; /* FIX */
+}
+
+.admin-project-card:hover{
+background:#eef2f7;
+}
+
+/* LEFT SIDE (IMAGE + TITLE) */
+
+.project-info{
+display:flex;
+align-items:center;
+gap:12px;
+flex:1; /* FIX */
+min-width:0; /* FIX */
+}
+
+/* PROJECT IMAGE */
+
+.admin-project-image{
+width:60px;
+height:60px;
+object-fit:cover;
+border-radius:8px;
+}
+
+/* PROJECT TITLE */
+
+.project-info h4{
+margin:0;
+font-size:16px;
+color:#2c3e50;
+white-space:nowrap;       /* FIX */
+overflow:hidden;          /* FIX */
+text-overflow:ellipsis;   /* FIX */
+}
+
+/* STATUS BADGE */
+
+.status-badge{
+padding:5px 10px;
+border-radius:20px;
+font-size:12px;
+}
+
+.status-ongoing{
+background:#fff3cd;
+color:#856404;
+}
+
+.status-completed{
+background:#d4edda;
+color:#155724;
+}
+
+/* BUTTON GROUP */
+
+.project-actions{
+display:flex;
+align-items:center;
+gap:10px;
+flex-shrink:0; /* FIX */
+}
+
+/* EDIT BUTTON */
+
+.edit-btn{
+background:#3498db;
+color:white;
+border:none;
+padding:7px 14px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.edit-btn:hover{
+background:#2980b9;
+}
+
+/* DELETE BUTTON */
+
+.delete-btn{
+background:#e74c3c;
+color:white;
+border:none;
+padding:7px 14px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.delete-btn:hover{
+background:#c0392b;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.admin-grid{
+grid-template-columns:1fr;
+}
+
+.admin-project-card{
+flex-direction:column;
+align-items:flex-start;
+gap:10px;
+}
+
+.project-actions{
+width:100%;
+display:flex;
+justify-content:flex-end;
+}
+
+}
