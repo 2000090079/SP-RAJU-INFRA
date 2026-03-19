@@ -3,116 +3,123 @@ import "../styles/contact.css";
 
 function Contact() {
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: ""
-  });
+const BASE_URL = import.meta.env.VITE_API_URL || "https://sp-raju-infra.onrender.com";
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+const [formData, setFormData] = useState({
+name: "",
+email: "",
+message: ""
+});
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleChange = (e) => {
+setFormData({
+...formData,
+[e.target.name]: e.target.value
+});
+};
 
-    try {
-      const res = await fetch("http://localhost:5000/send-enquiry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      });
+const handleSubmit = async (e) => {
+e.preventDefault();
 
-      const data = await res.json();
+try {
 
-      alert(data.message);
+const res = await fetch(`${BASE_URL}/send-enquiry`, {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify(formData)
+});
 
-      // reset form
-      setFormData({
-        name: "",
-        email: "",
-        message: ""
-      });
+const data = await res.json();
 
-    } catch (err) {
-      console.error(err);
-      alert("Error sending enquiry");
-    }
-  };
+alert(data.message || "Enquiry sent successfully!");
 
-  return (
-    <section id="contact" className="contact-section">
-      <h2 className="section-title">Contact Us</h2>
+setFormData({
+name: "",
+email: "",
+message: ""
+});
 
-      <div className="contact-container">
+} catch (err) {
+console.error(err);
+alert("Error sending enquiry");
+}
+};
 
-        {/* CONTACT INFO */}
-        <div className="contact-info contact-box">
-          <h3>Contact Information</h3>
-          <p>🏢 <strong>Company:</strong> SP Raju Infra</p>
-          <p>📞 <strong>Phone:</strong> +91 8008780207</p>
-          <p>✉️ <strong>Email:</strong> sprajuinfra.co@gmail.com</p>
-          <p>📍 <strong>Address:</strong> Rajahmundry, Andhra Pradesh</p>
-        </div>
+return (
+<section id="contact" className="contact-section">
 
-        {/* GOOGLE MAP */}
-        <div className="contact-map contact-box">
-          <h3>Our Location</h3>
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3815.335839088364!2d81.8083386!3d17.007189099999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a37a3c3ea7a174f%3A0x4deae3aa92df5bdf!2sSP%20RAJU%20INFRA%20Head%20office!5e0!3m2!1sen!2sin!4v1773479573238!5m2!1sen!2sin"
-            title="SP Raju Infra Head Office"
-            loading="lazy"
-            allowFullScreen
-          ></iframe>
-        </div>
+<h2 className="section-title">Contact Us</h2>
 
-        {/* ENQUIRY FORM */}
-        <div className="contact-form contact-box">
-          <h3>Send Enquiry</h3>
+<div className="contact-container">
 
-          <form onSubmit={handleSubmit}>
+{/* CONTACT INFO */}
+<div className="contact-info contact-box">
+<h3>Contact Information</h3>
+<p>🏢 <strong>Company:</strong> SP Raju Infra</p>
+<p>📞 <strong>Phone:</strong> +91 8008780207</p>
+<p>✉️ <strong>Email:</strong> sprajuinfra.co@gmail.com</p>
+<p>📍 <strong>Address:</strong> Rajahmundry, Andhra Pradesh</p>
+</div>
 
-            <input
-              type="text"
-              name="name"
-              placeholder="Your Name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
+{/* GOOGLE MAP */}
+<div className="contact-map contact-box">
+<h3>Our Location</h3>
+<iframe
+src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3815.335839088364!2d81.8083386!3d17.007189099999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a37a3c3ea7a174f%3A0x4deae3aa92df5bdf!2sSP%20RAJU%20INFRA%20Head%20office!5e0!3m2!1sen!2sin!4v1773479573238!5m2!1sen!2sin"
+title="SP Raju Infra Head Office"
+loading="lazy"
+allowFullScreen
+></iframe>
+</div>
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+{/* FORM */}
+<div className="contact-form contact-box">
 
-            <textarea
-              name="message"
-              placeholder="Your Message"
-              rows="5"
-              value={formData.message}
-              onChange={handleChange}
-              required
-            ></textarea>
+<h3>Send Enquiry</h3>
 
-            <button type="submit" className="enquiry-btn">
-              <span className="btn-text">Send Enquiry</span>
-            </button>
+<form onSubmit={handleSubmit}>
 
-          </form>
-        </div>
-      </div>
-    </section>
-  );
+<input
+type="text"
+name="name"
+placeholder="Your Name"
+value={formData.name}
+onChange={handleChange}
+required
+/>
+
+<input
+type="email"
+name="email"
+placeholder="Email Address"
+value={formData.email}
+onChange={handleChange}
+required
+/>
+
+<textarea
+name="message"
+placeholder="Your Message"
+rows="5"
+value={formData.message}
+onChange={handleChange}
+required
+></textarea>
+
+<button type="submit" className="enquiry-btn">
+<span className="btn-text">Send Enquiry</span>
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</section>
+);
 }
 
 export default Contact;

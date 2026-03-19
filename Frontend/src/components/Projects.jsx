@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 
 function Projects(){
 
+const BASE_URL = import.meta.env.VITE_API_URL || "https://sp-raju-infra.onrender.com"
+
 const [projects,setProjects] = useState([])
 const [selectedProject,setSelectedProject] = useState(null)
 const [currentImage,setCurrentImage] = useState(0)
@@ -24,7 +26,7 @@ const loadProjects = async ()=>{
 
 try{
 
-const res = await fetch("http://localhost:5000/projects")
+const res = await fetch(`${BASE_URL}/projects`)
 const data = await res.json()
 
 const sortedProjects = data.sort((a,b)=>
@@ -34,9 +36,7 @@ Number(b.startYear) - Number(a.startYear)
 setProjects(sortedProjects)
 
 }catch(error){
-
 console.log(error)
-
 }
 
 }
@@ -82,10 +82,8 @@ setCurrentImage(currentImage-1)
 
 const filteredProjects = projects
 .filter(project => {
-
 if(filter === "all") return true
 return project.status === filter
-
 })
 .slice(0,visibleCount)
 
@@ -132,7 +130,7 @@ onClick={()=>openProject(project)}
 >
 
 <img
-src={`http://localhost:5000${project.images[0]}`}
+src={project.images?.[0] ? `${BASE_URL}${project.images[0]}` : "/no-image.png"}
 alt={project.title}
 className="project-image"
 />
@@ -172,7 +170,7 @@ View More Projects
 )}
 
 
-{/* PROJECT MODAL */}
+/* PROJECT MODAL */
 
 {selectedProject && (
 
@@ -194,7 +192,7 @@ View More Projects
 </button>
 
 <img
-src={`http://localhost:5000${selectedProject.images[currentImage]}`}
+src={selectedProject.images?.[currentImage] ? `${BASE_URL}${selectedProject.images[currentImage]}` : "/no-image.png"}
 className="modal-image"
 alt={selectedProject.title}
 />
@@ -215,8 +213,6 @@ alt={selectedProject.title}
 <h2 className="project-title">
 {selectedProject.title}
 </h2>
-
-
 
 </div>
 
