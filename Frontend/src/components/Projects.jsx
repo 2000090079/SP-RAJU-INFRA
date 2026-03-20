@@ -56,26 +56,22 @@ setSelectedProject(null)
 
 /* NEXT IMAGE */
 
-const nextImage = ()=>{
+const nextImage = () => {
+  if (!selectedProject?.images?.length) return
 
-if(currentImage < selectedProject.images.length-1){
-setCurrentImage(currentImage+1)
-}else{
-setCurrentImage(0)
-}
-
+  setCurrentImage(prev =>
+    prev < selectedProject.images.length - 1 ? prev + 1 : 0
+  )
 }
 
 /* PREVIOUS IMAGE */
 
-const prevImage = ()=>{
+const prevImage = () => {
+  if (!selectedProject?.images?.length) return
 
-if(currentImage === 0){
-setCurrentImage(selectedProject.images.length-1)
-}else{
-setCurrentImage(currentImage-1)
-}
-
+  setCurrentImage(prev =>
+    prev === 0 ? selectedProject.images.length - 1 : prev - 1
+  )
 }
 
 /* FILTER PROJECTS */
@@ -130,11 +126,13 @@ onClick={()=>openProject(project)}
 >
 
 <img
+  loading="lazy"
   src={
-  project.images?.[0]
-    ? project.images[0].replace("/upload/", "/upload/w_600,q_auto/")
-    : "/no-image.png"
-}
+    project.images?.[0]?.includes("cloudinary")
+      ? project.images[0].replace("/upload/", "/upload/w_600,q_auto,f_auto/")
+      : project.images?.[0] || "/no-image.png"
+  }
+  alt={project.title}
 />
 
 <div className="project-content">
@@ -194,11 +192,13 @@ View More Projects
 </button>
 
 <img
-src={
-  selectedProject.images?.[currentImage]
-    ? selectedProject.images[currentImage].replace("/upload/", "/upload/w_800,q_auto/")
-    : "/no-image.png"
-}
+  loading="lazy"
+  src={
+    selectedProject.images?.[currentImage]?.includes("cloudinary")
+      ? selectedProject.images[currentImage].replace("/upload/", "/upload/w_800,q_auto,f_auto/")
+      : selectedProject.images?.[currentImage] || "/no-image.png"
+  }
+  alt={selectedProject.title}
 />
 
 <button onClick={nextImage} className="slider-btn right">
