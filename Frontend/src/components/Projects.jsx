@@ -130,9 +130,11 @@ onClick={()=>openProject(project)}
 >
 
 <img
-  src={project.images?.[0] || "/no-image.png"}
-  loading="lazy"
-  alt={project.title}
+  src={
+  project.images?.[0]
+    ? project.images[0].replace("/upload/", "/upload/w_600,q_auto/")
+    : "/no-image.png"
+}
 />
 
 <div className="project-content">
@@ -192,9 +194,11 @@ View More Projects
 </button>
 
 <img
-src={selectedProject.images?.[currentImage] || "/no-image.png"}
-className="modal-image"
-alt={selectedProject.title}
+src={
+  selectedProject.images?.[currentImage]
+    ? selectedProject.images[currentImage].replace("/upload/", "/upload/w_800,q_auto/")
+    : "/no-image.png"
+}
 />
 
 <button onClick={nextImage} className="slider-btn right">
