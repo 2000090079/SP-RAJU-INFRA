@@ -1,67 +1,61 @@
-const express = require("express");
-const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const express = require("express")
+const router = express.Router()
+const multer = require("multer")
+const { CloudinaryStorage } = require("multer-storage-cloudinary")
+const cloudinary = require("../config/cloudinary")
 
-const Project = require("../models/Project");
+const Project = require("../models/Project")
 
-/* ENSURE UPLOAD FOLDER EXISTS */
-const uploadDir = "uploads";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
+/* ==============================
+   CLOUDINARY STORAGE
+================================ */
 
-/* STORAGE CONFIG */
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "sp-raju-projects",
+    allowed_formats: ["jpg", "png", "jpeg"]
+  }
+})
 
-const upload = multer({ storage });
+const upload = multer({ storage })
 
-/* GET ALL PROJECTS */
+/* ==============================
+   GET ALL PROJECTS
+================================ */
+
 router.get("/", async (req, res) => {
   try {
-    const projects = await Project.find().sort({ _id: -1 });
-    res.json(projects);
+    const projects = await Project.find().sort({ _id: -1 })
+    res.json(projects)
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch projects" });
+    console.error(err)
+    res.status(500).json({ error: "Failed to fetch projects" })
   }
-});
+})
 
-/* CREATE PROJECT */
+/* ==============================
+   CREATE PROJECT
+================================ */
+
 router.post("/", upload.array("images", 10), async (req, res) => {
   try {
-    console.log("CREATE BODY:", req.body);
 
-    const imagePaths = req.files
-      ? req.files.map((file) => `/uploads/${file.filename}`)
-      : [];
+    const imageUrls = req.files
+      ? req.files.map(file => file.path)   // ✅ CLOUDINARY URL
+      : []
 
     /* SAFE BHK PARSE */
-    let bhkTypes = [];
+    let bhkTypes = []
     if (req.body.bhkTypes) {
       try {
         bhkTypes = Array.isArray(req.body.bhkTypes)
           ? req.body.bhkTypes
-          : JSON.parse(req.body.bhkTypes);
-      } catch (e) {
-        bhkTypes = [];
+          : JSON.parse(req.body.bhkTypes)
+      } catch {
+        bhkTypes = []
       }
     }
-
-    /* 🔥 FIXED PROPERTY TYPE */
-    const propertyType = req.body.propertyType
-      ? req.body.propertyType.trim()
-      : null;
-
-    console.log("PROPERTY TYPE:", propertyType);
 
     const project = new Project({
       title: req.body.title,
@@ -72,27 +66,29 @@ router.post("/", upload.array("images", 10), async (req, res) => {
       possessionMonth: req.body.possessionMonth || "",
       possessionYear: req.body.possessionYear || "",
       bhkTypes: bhkTypes,
-      propertyType: propertyType, 
+      propertyType: req.body.propertyType?.trim() || "",
       sft: req.body.sft || "",
       location: req.body.location || "",
-      images: imagePaths,
-    });
+      images: imageUrls   // ✅ STORE CLOUDINARY LINKS
+    })
 
-    const savedProject = await project.save();
-    res.json(savedProject);
+    const savedProject = await project.save()
+    res.json(savedProject)
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Upload failed" });
+    console.error(err)
+    res.status(500).json({ error: "Upload failed" })
   }
-});
+})
 
-/* UPDATE PROJECT */
+/* ==============================
+   UPDATE PROJECT
+================================ */
+
 router.put("/:id", upload.array("images", 10), async (req, res) => {
   try {
-    console.log("UPDATE ATTEMPT FOR ID:", req.params.id);
-    console.log("UPDATE BODY:", req.body);
 
-    const updateData = {};
+    const updateData = {}
 
     const fields = [
       "title",
@@ -103,70 +99,76 @@ router.put("/:id", upload.array("images", 10), async (req, res) => {
       "possessionMonth",
       "possessionYear",
       "sft",
-      "location",
-    ];
+      "location"
+    ]
 
-    fields.forEach((field) => {
+    fields.forEach(field => {
       if (req.body[field] !== undefined) {
-        updateData[field] = req.body[field];
+        updateData[field] = req.body[field]
       }
-    });
+    })
 
-    /* 🔥 FIXED PROPERTY TYPE IN UPDATE */
+    /* PROPERTY TYPE */
     if (req.body.propertyType !== undefined) {
-      updateData.propertyType = req.body.propertyType.trim();
+      updateData.propertyType = req.body.propertyType.trim()
     }
 
-    /* SAFE BHK PARSE */
+    /* BHK TYPES */
     if (req.body.bhkTypes) {
       try {
         updateData.bhkTypes = Array.isArray(req.body.bhkTypes)
           ? req.body.bhkTypes
-          : JSON.parse(req.body.bhkTypes);
-      } catch (e) {
-        console.log("BHK Parse Error in Update");
+          : JSON.parse(req.body.bhkTypes)
+      } catch {
+        console.log("BHK Parse Error")
       }
     }
 
-    /* HANDLE IMAGES */
+    /* HANDLE NEW IMAGES */
     if (req.files && req.files.length > 0) {
-      updateData.images = req.files.map(
-        (file) => `/uploads/${file.filename}`
-      );
+      updateData.images = req.files.map(file => file.path) // ✅ CLOUDINARY
     }
 
     const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
       { new: true, runValidators: true }
-    );
+    )
 
     if (!updatedProject) {
-      return res.status(404).json({ message: "Project not found" });
+      return res.status(404).json({ message: "Project not found" })
     }
 
-    console.log("UPDATE SUCCESSFUL");
-    res.json(updatedProject);
-  } catch (err) {
-    console.error("UPDATE ERROR:", err);
-    res.status(500).json({ error: "Update failed", details: err.message });
-  }
-});
+    res.json(updatedProject)
 
-/* DELETE PROJECT */
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Update failed" })
+  }
+})
+
+/* ==============================
+   DELETE PROJECT
+================================ */
+
 router.delete("/:id", async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id)
+
     if (!project) {
-      return res.status(404).json({ message: "Project not found" });
+      return res.status(404).json({ message: "Project not found" })
     }
 
-    await Project.findByIdAndDelete(req.params.id);
-    res.json({ message: "Project deleted" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Delete failed" });
-  }
-});
+    // Optional: delete from cloudinary (advanced - skip for now)
 
-module.exports = router;
+    await Project.findByIdAndDelete(req.params.id)
+
+    res.json({ message: "Project deleted" })
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Delete failed" })
+  }
+})
+
+module.exports = router
