@@ -38,11 +38,10 @@ loadProjects()
 const loadProjects = async () => {
 try {
 const res = await fetch(`${BASE_URL}/projects`)
-if (!res.ok) throw new Error("Failed to fetch projects")
 const data = await res.json()
 setProjects(data)
 } catch (error) {
-console.error("Error loading projects:", error)
+console.error(error)
 }
 }
 
@@ -50,8 +49,7 @@ console.error("Error loading projects:", error)
 const handleImageChange = (e) => {
 const files = Array.from(e.target.files)
 setImages(files)
-const previewUrls = files.map(file => URL.createObjectURL(file))
-setPreview(previewUrls)
+setPreview(files.map(file => URL.createObjectURL(file)))
 }
 
 /* HANDLE PROPERTY TYPE */
@@ -68,7 +66,7 @@ setBhkTypes([...bhkTypes, bhk])
 }
 }
 
-/* ADD OR UPDATE PROJECT */
+/* ADD OR UPDATE */
 const handleSubmit = async (e) => {
 e.preventDefault()
 
@@ -84,13 +82,10 @@ formData.append("possessionYear", possessionYear)
 formData.append("propertyType", propertyType)
 formData.append("sft", sft)
 formData.append("location", location)
-
 formData.append("bhkTypes", JSON.stringify(bhkTypes))
 
 if (images.length > 0) {
-images.forEach(img => {
-formData.append("images", img)
-})
+images.forEach(img => formData.append("images", img))
 }
 
 try {
@@ -107,22 +102,19 @@ method,
 body: formData
 })
 
-if (!res.ok) throw new Error("Operation failed")
-
 await res.json()
 
-alert(editId ? "Project Updated Successfully!" : "Project Added Successfully!")
+alert(editId ? "Updated!" : "Added!")
 
 resetForm()
 loadProjects()
 
-} catch (error) {
-console.error("Error:", error)
-alert("Failed to save project. Check console.")
+} catch (err) {
+console.error(err)
 }
 }
 
-/* EDIT PROJECT */
+/* EDIT */
 const editProject = (project) => {
 window.scrollTo(0, 0)
 
@@ -139,32 +131,17 @@ setSft(project.sft || "")
 setLocation(project.location || "")
 setEditId(project._id)
 
-if (project.images && project.images.length > 0) {
-setPreview(project.images.map(img => `${BASE_URL}${img}`))
-} else {
-setPreview([])
-}
+/* ✅ FIXED HERE */
+setPreview(project.images || [])
 }
 
-/* DELETE PROJECT */
+/* DELETE */
 const deleteProject = async (id) => {
-if (!window.confirm("Are you sure you want to delete this project?")) return
-
-try {
-const res = await fetch(`${BASE_URL}/projects/${id}`, {
-method: "DELETE"
-})
-
-if (!res.ok) throw new Error("Delete failed")
-
+await fetch(`${BASE_URL}/projects/${id}`, { method: "DELETE" })
 loadProjects()
-
-} catch (error) {
-console.error("Delete error:", error)
-}
 }
 
-/* RESET FORM */
+/* RESET */
 const resetForm = () => {
 setTitle("")
 setDescription("")
@@ -191,168 +168,44 @@ navigate("/sprajuco-login")
 return (
 <div className="admin-wrapper">
 
-<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-<h1 className="admin-title">Admin Dashboard</h1>
-
-<button
-onClick={logout}
-className="logout-btn"
-style={{
-padding: "8px 16px",
-background: "#e74c3c",
-color: "white",
-border: "none",
-borderRadius: "5px",
-cursor: "pointer"
-}}
->
-Logout
-</button>
-</div>
-
-<div className="admin-grid">
-
-{/* FORM */}
-<div className="admin-form-card">
-
-<h2>{editId ? "📝 Edit Project" : "➕ Add New Project"}</h2>
+<h1>Admin Dashboard</h1>
 
 <form onSubmit={handleSubmit}>
 
-<input type="text" placeholder="Project Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-
-<textarea placeholder="Project Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
-
-<div className="form-group">
-<label>Project Status</label>
-<select value={status} onChange={(e) => setStatus(e.target.value)}>
-<option value="ongoing">Ongoing</option>
-<option value="completed">Completed</option>
-</select>
-</div>
-
-<div className="date-section">
-
-<div>
-<h4>Start Date</h4>
-<select value={startMonth} onChange={(e) => setStartMonth(e.target.value)}>
-<option value="">Month</option>
-{["January","February","March","April","May","June","July","August","September","October","November","December"].map(m => <option key={m}>{m}</option>)}
-</select>
-<input type="number" placeholder="Year" value={startYear} onChange={(e) => setStartYear(e.target.value)} />
-</div>
-
-<div>
-<h4>Possession Date</h4>
-<select value={possessionMonth} onChange={(e) => setPossessionMonth(e.target.value)}>
-<option value="">Month</option>
-{["January","February","March","April","May","June","July","August","September","October","November","December"].map(m => <option key={m}>{m}</option>)}
-</select>
-<input type="number" placeholder="Year" value={possessionYear} onChange={(e) => setPossessionYear(e.target.value)} />
-</div>
-
-</div>
-
-<h4>BHK Types</h4>
-
-<div className="bhk-boxes">
-{["2BHK","3BHK","4BHK","5BHK"].map(bhk => (
-<div
-key={bhk}
-className={`bhk-box ${bhkTypes.includes(bhk) ? "active" : ""}`}
-onClick={() => toggleBHK(bhk)}
->
-{bhk}
-</div>
-))}
-</div>
-
-<h4>Property Type</h4>
-
-<div className="bhk-boxes">
-{["Apartment","Villa","Open Plot"].map(type => (
-<div
-key={type}
-className={`bhk-box ${propertyType === type ? "active" : ""}`}
-onClick={() => togglePropertyType(type)}
->
-{type}
-</div>
-))}
-</div>
-
-<input type="text" placeholder="Area (e.g. 1100 - 1450 SFT)" value={sft} onChange={(e) => setSft(e.target.value)} />
-
-<input type="text" placeholder="Project Location" value={location} onChange={(e) => setLocation(e.target.value)} />
-
-<h4>Upload Images {editId && "(Leave empty to keep existing images)"}</h4>
+<input value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" />
+<textarea value={description} onChange={e => setDescription(e.target.value)} />
 
 <input type="file" multiple onChange={handleImageChange} />
 
-<div className="preview-container" style={{ display:"flex", gap:"10px", flexWrap:"wrap", marginTop:"10px" }}>
-{preview.map((img,index) => (
-<img key={index} src={img} alt="preview" style={{ width:"80px", height:"80px", objectFit:"cover", borderRadius:"6px", border:"1px solid #ddd" }} />
+{/* PREVIEW */}
+<div>
+{preview.map((img, i) => (
+<img key={i} src={img} width="80" />
 ))}
 </div>
 
-<div style={{ display:"flex", gap:"10px", marginTop:"20px" }}>
-<button type="submit" style={{ flex:2 }}>
-{editId ? "Update Project" : "Add Project"}
-</button>
-
-{editId && (
-<button type="button" onClick={resetForm} style={{ flex:1, background:"#95a5a6" }}>
-Cancel
-</button>
-)}
-
-</div>
+<button type="submit">{editId ? "Update" : "Add"}</button>
 
 </form>
 
-</div>
+<hr />
 
 {/* PROJECT LIST */}
-<div className="admin-projects">
+{projects.map(p => (
+<div key={p._id}>
 
-<h2>Existing Projects ({projects.length})</h2>
-
-{projects.map(project => (
-
-<div key={project._id} className="admin-project-card">
-
-<div className="project-info">
-
-{project.images && project.images[0] && (
-<img
-src={`${BASE_URL}${project.images[0]}`}
-className="admin-project-image"
-alt="thumb"
-/>
+{/* ✅ FIXED HERE */}
+{p.images?.[0] && (
+<img src={p.images[0]} width="100" />
 )}
 
-<div>
-<h4>{project.title}</h4>
-<p>{project.location} | {project.propertyType}</p>
-<span className={`status-badge status-${project.status}`}>
-{project.status}
-</span>
-</div>
+<h3>{p.title}</h3>
+
+<button onClick={() => editProject(p)}>Edit</button>
+<button onClick={() => deleteProject(p._id)}>Delete</button>
 
 </div>
-
-<div className="admin-actions">
-<button className="edit-btn" onClick={() => editProject(project)}>Edit</button>
-<button className="delete-btn" onClick={() => deleteProject(project._id)}>Delete</button>
-</div>
-
-</div>
-
 ))}
-
-</div>
-
-</div>
 
 </div>
 )

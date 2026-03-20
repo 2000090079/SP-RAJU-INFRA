@@ -130,9 +130,9 @@ onClick={()=>openProject(project)}
 >
 
 <img
-src={project.images?.[0] ? `${BASE_URL}${project.images[0]}` : "/no-image.png"}
-alt={project.title}
-className="project-image"
+  src={project.images?.[0] || "/no-image.png"}
+  loading="lazy"
+  alt={project.title}
 />
 
 <div className="project-content">
@@ -192,7 +192,7 @@ View More Projects
 </button>
 
 <img
-src={selectedProject.images?.[currentImage] ? `${BASE_URL}${selectedProject.images[currentImage]}` : "/no-image.png"}
+src={selectedProject.images?.[currentImage] || "/no-image.png"}
 className="modal-image"
 alt={selectedProject.title}
 />
