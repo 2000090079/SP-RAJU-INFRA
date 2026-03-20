@@ -122,7 +122,9 @@ app.post("/send-enquiry", async (req, res) => {
 
   try {
 
-    // Mail to admin
+    console.log("📩 Enquiry received:", name)
+
+    // Send admin mail
     await transporter.sendMail({
       from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
@@ -135,20 +137,19 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
-    // Auto reply
-    await transporter.sendMail({
+    // ✅ SEND RESPONSE IMMEDIATELY
+    res.status(200).json({ message: "Enquiry sent successfully" })
+
+    // Auto reply (background)
+    transporter.sendMail({
       from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "We received your enquiry - SP Raju Infra",
       html: `
         <p>Hi ${name},</p>
-        <p>Thank you for contacting SP Raju Infra. We will get back to you soon.</p>
-        <br/>
-        <p>Regards,<br/>SP Raju Infra Team</p>
+        <p>Thank you for contacting SP Raju Infra.</p>
       `
-    })
-
-    res.status(200).json({ message: "Enquiry sent successfully" })
+    }).catch(err => console.error("Auto-reply failed:", err))
 
   } catch (err) {
     console.error("❌ Email error:", err)
