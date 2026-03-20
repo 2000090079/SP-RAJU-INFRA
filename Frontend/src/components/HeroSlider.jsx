@@ -73,16 +73,17 @@ onTouchStart={handleTouchStart}
 onTouchEnd={handleTouchEnd}
 >
 
-{images.map((img,index)=>(
-
-<img
-key={index}
-src={img}
-loading="lazy"   // ⬅️ performance boost
-className={`slide ${index===current?"active":""}`}
-alt="Construction"
-/>
-
+{images.map((img, index) => (
+  <div
+    key={index}
+    className={`slide ${index === current ? "active" : ""}`}
+  >
+    <img
+      src={img}
+      loading={index === 0 ? "eager" : "lazy"}
+      alt="Construction"
+    />
+  </div>
 ))}
 
 <button className="arrow left" onClick={prevSlide}>❮</button>
