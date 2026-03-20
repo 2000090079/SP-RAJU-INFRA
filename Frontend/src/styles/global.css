@@ -152,14 +152,15 @@ background:#000;
 }
     
 .hero::after{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.25);
-z-index:1;
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.25);
+  z-index:1;
+  pointer-events:none;   
 }
 
 .slideshow{
@@ -846,11 +847,6 @@ margin-top:40px;
   .hero{
     height:60vh;
   }
-  
-  .slide img{
-  object-fit:contain;   
-  background:#000;     
-}
 
   .arrow{
     font-size:20px;
@@ -920,5 +916,10 @@ margin-top:40px;
   .project-title{
     font-size:28px;
   }
+
+  .slide img{
+  object-fit:contain;   
+  background:#000;     
+}
 
 }  
