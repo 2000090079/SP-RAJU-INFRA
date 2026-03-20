@@ -846,6 +846,11 @@ margin-top:40px;
   .hero{
     height:60vh;
   }
+  
+  .slide img{
+  object-fit:contain;   
+  background:#000;     
+}
 
   .arrow{
     font-size:20px;
