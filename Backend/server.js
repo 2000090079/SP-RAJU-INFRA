@@ -1,8 +1,6 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
-const path = require("path")
-const fs = require("fs")
 const nodemailer = require("nodemailer")
 require("dotenv").config()
 
@@ -12,17 +10,7 @@ const projectRoutes = require("./routes/projects")
 const app = express()
 
 /* ==============================
-   ENSURE UPLOADS FOLDER EXISTS
-================================ */
-
-const uploadDir = path.join(__dirname, "uploads")
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir)
-}
-
-/* ==============================
-   CORS (FIXED FOR DOMAIN)
+   CORS (FOR DOMAIN + LOCAL)
 ================================ */
 
 app.use(cors({
@@ -56,7 +44,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS
   },
   tls: {
-    rejectUnauthorized: false   // ✅ FIXED SMTP ERROR
+    rejectUnauthorized: false
   }
 })
 
@@ -81,30 +69,20 @@ mongoose.connect(process.env.MONGO_URI)
 .catch((err) => console.error("❌ MongoDB Connection Error:", err))
 
 /* ==============================
-   DATABASE STATUS CHECK
-================================ */
-
-app.get("/db-status", (req, res) => {
-  if (mongoose.connection.readyState === 1) {
-    res.send("✅ MongoDB Connected")
-  } else {
-    res.send("❌ MongoDB Not Connected")
-  }
-})
-
-/* ==============================
-   ROOT TEST ROUTE
+   HEALTH CHECK ROUTES
 ================================ */
 
 app.get("/", (req, res) => {
   res.send("🔥 Backend is working")
 })
 
-/* ==============================
-   STATIC FILES
-================================ */
-
-app.use("/uploads", express.static(uploadDir))
+app.get("/db-status", (req, res) => {
+  res.send(
+    mongoose.connection.readyState === 1
+      ? "✅ MongoDB Connected"
+      : "❌ MongoDB Not Connected"
+  )
+})
 
 /* ==============================
    API ROUTES
@@ -144,7 +122,7 @@ app.post("/send-enquiry", async (req, res) => {
 
   try {
 
-    // Send to admin
+    // Mail to admin
     await transporter.sendMail({
       from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
@@ -157,14 +135,14 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
-    // Auto reply to user
+    // Auto reply
     await transporter.sendMail({
       from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "We received your enquiry - SP Raju Infra",
       html: `
         <p>Hi ${name},</p>
-        <p>Thank you for contacting SP Raju Infra. We have received your enquiry and will get back to you shortly.</p>
+        <p>Thank you for contacting SP Raju Infra. We will get back to you soon.</p>
         <br/>
         <p>Regards,<br/>SP Raju Infra Team</p>
       `
