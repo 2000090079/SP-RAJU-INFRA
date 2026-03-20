@@ -2,9 +2,8 @@ const express = require("express")
 const router = express.Router()
 const multer = require("multer")
 
-// ✅ FIXED IMPORT (IMPORTANT)
-const cloudinaryStorage = require("multer-storage-cloudinary")
-const CloudinaryStorage = cloudinaryStorage.CloudinaryStorage
+// ✅ CORRECT IMPORT
+const { CloudinaryStorage } = require("multer-storage-cloudinary")
 
 const cloudinary = require("../config/cloudinary")
 const Project = require("../models/Project")
@@ -15,9 +14,12 @@ const Project = require("../models/Project")
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "sp-raju-projects",
-    allowed_formats: ["jpg", "png", "jpeg"]
+  params: async (req, file) => {
+    return {
+      folder: "sp-raju-projects",
+      public_id: Date.now() + "-" + file.originalname,
+      resource_type: "image"
+    }
   }
 })
 
@@ -43,7 +45,6 @@ router.get("/", async (req, res) => {
 
 router.post("/", upload.array("images", 10), async (req, res) => {
   try {
-
     const imageUrls = req.files
       ? req.files.map(file => file.path)
       : []
@@ -89,7 +90,6 @@ router.post("/", upload.array("images", 10), async (req, res) => {
 
 router.put("/:id", upload.array("images", 10), async (req, res) => {
   try {
-
     const updateData = {}
 
     const fields = [
