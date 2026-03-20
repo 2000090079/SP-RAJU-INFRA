@@ -128,11 +128,12 @@ onClick={()=>openProject(project)}
 <img
   loading="lazy"
   src={
-    project.images?.[0]?.includes("cloudinary")
+    project.images?.[0]?.includes("/upload/")
       ? project.images[0].replace("/upload/", "/upload/w_600,q_auto,f_auto/")
       : project.images?.[0] || "/no-image.png"
   }
   alt={project.title}
+  className="project-image"
 />
 
 <div className="project-content">
@@ -194,7 +195,7 @@ View More Projects
 <img
   loading="lazy"
   src={
-    selectedProject.images?.[currentImage]?.includes("cloudinary")
+    selectedProject.images?.[currentImage]?.includes("/upload/")
       ? selectedProject.images[currentImage].replace("/upload/", "/upload/w_800,q_auto,f_auto/")
       : selectedProject.images?.[currentImage] || "/no-image.png"
   }
