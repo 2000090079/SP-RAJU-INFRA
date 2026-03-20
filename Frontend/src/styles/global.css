@@ -842,72 +842,78 @@ margin-top:40px;
 /* MOBILE */
 
 @media(max-width:768px){
+
   .hero{
-    height:60vh;   
+    height:60vh;
   }
-}
 
-.arrow{
-font-size:20px;
-padding:8px 10px;
-}
+  .arrow{
+    font-size:20px;
+    padding:8px 10px;
+  }
 
-.about-section{
-min-height:auto;
-padding:40px 15px;
-}
+  .about-section{
+    min-height:auto;
+    padding:40px 15px;
+  }
 
-.project-modal{
-padding:10px;
-align-items:flex-start;
-}
+  .project-modal{
+    padding:10px;
+    align-items:flex-start;
+  }
 
-.modal-right{
-padding:20px;
-}
-  /* Navbar adjustments for mobile functionality */
+  .modal-right{
+    padding:20px;
+  }
+
+  /* Navbar */
   .nav {
     flex-direction: column;
     padding: 10px;
   }
+
   .nav-links {
     position: static;
     transform: none;
     margin-top: 10px;
     gap: 15px;
   }
+
   .nav-separator {
     display: none;
   }
 
-  /* Structural fixes for modal on mobile */
+  /* Modal */
   .modal-content{
     grid-template-columns: 1fr;
     height: auto;
     max-height: 90vh;
     overflow-y: auto;
   }
+
   .modal-left {
     height: 250px;
   }
 
-  /* Grid adjustments for mobile */
+  /* Grid fixes */
   .contact-container{
     grid-template-columns: 1fr;
   }
+
   .stats-grid{
     grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
   }
+
   .spec-grid{
     grid-template-columns:1fr;
   }
+
   .location-card{
     grid-column:span 1;
   }
+
   .project-title{
     font-size:28px;
   }
-}
-  *{
-max-width:100%;
-}
+
+}  
