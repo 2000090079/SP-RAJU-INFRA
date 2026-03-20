@@ -1,9 +1,12 @@
 const express = require("express")
 const router = express.Router()
 const multer = require("multer")
-const { CloudinaryStorage } = require("multer-storage-cloudinary")
-const cloudinary = require("../config/cloudinary")
 
+// ✅ FIXED IMPORT (IMPORTANT)
+const cloudinaryStorage = require("multer-storage-cloudinary")
+const CloudinaryStorage = cloudinaryStorage.CloudinaryStorage
+
+const cloudinary = require("../config/cloudinary")
 const Project = require("../models/Project")
 
 /* ==============================
@@ -42,10 +45,9 @@ router.post("/", upload.array("images", 10), async (req, res) => {
   try {
 
     const imageUrls = req.files
-      ? req.files.map(file => file.path)   // ✅ CLOUDINARY URL
+      ? req.files.map(file => file.path)
       : []
 
-    /* SAFE BHK PARSE */
     let bhkTypes = []
     if (req.body.bhkTypes) {
       try {
@@ -69,7 +71,7 @@ router.post("/", upload.array("images", 10), async (req, res) => {
       propertyType: req.body.propertyType?.trim() || "",
       sft: req.body.sft || "",
       location: req.body.location || "",
-      images: imageUrls   // ✅ STORE CLOUDINARY LINKS
+      images: imageUrls
     })
 
     const savedProject = await project.save()
@@ -108,12 +110,10 @@ router.put("/:id", upload.array("images", 10), async (req, res) => {
       }
     })
 
-    /* PROPERTY TYPE */
     if (req.body.propertyType !== undefined) {
       updateData.propertyType = req.body.propertyType.trim()
     }
 
-    /* BHK TYPES */
     if (req.body.bhkTypes) {
       try {
         updateData.bhkTypes = Array.isArray(req.body.bhkTypes)
@@ -124,9 +124,8 @@ router.put("/:id", upload.array("images", 10), async (req, res) => {
       }
     }
 
-    /* HANDLE NEW IMAGES */
     if (req.files && req.files.length > 0) {
-      updateData.images = req.files.map(file => file.path) // ✅ CLOUDINARY
+      updateData.images = req.files.map(file => file.path)
     }
 
     const updatedProject = await Project.findByIdAndUpdate(
@@ -158,8 +157,6 @@ router.delete("/:id", async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" })
     }
-
-    // Optional: delete from cloudinary (advanced - skip for now)
 
     await Project.findByIdAndDelete(req.params.id)
 
