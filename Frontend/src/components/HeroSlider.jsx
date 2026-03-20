@@ -24,6 +24,7 @@ const images = [
 
 const [current,setCurrent] = useState(0)
 
+/* SLIDE FUNCTIONS */
 const nextSlide = () =>{
 setCurrent((prev)=>(prev+1)%images.length)
 }
@@ -32,27 +33,52 @@ const prevSlide = () =>{
 setCurrent((prev)=>(prev-1+images.length)%images.length)
 }
 
+/* AUTO SLIDE */
 useEffect(()=>{
 
 const interval = setInterval(()=>{
 setCurrent(prev=>(prev+1)%images.length)
-},2000)
+},4000)   // ⬅️ slower for smoothness
 
 return ()=>clearInterval(interval)
 
 },[])
 
+/* TOUCH SWIPE (MOBILE) */
+let startX = 0
+
+const handleTouchStart = (e) => {
+startX = e.touches[0].clientX
+}
+
+const handleTouchEnd = (e) => {
+const endX = e.changedTouches[0].clientX
+
+if (startX - endX > 50) {
+nextSlide()
+}
+
+if (endX - startX > 50) {
+prevSlide()
+}
+}
+
 return(
 
 <section className="hero">
 
-<div className="slideshow">
+<div
+className="slideshow"
+onTouchStart={handleTouchStart}
+onTouchEnd={handleTouchEnd}
+>
 
 {images.map((img,index)=>(
 
 <img
 key={index}
 src={img}
+loading="lazy"   // ⬅️ performance boost
 className={`slide ${index===current?"active":""}`}
 alt="Construction"
 />
