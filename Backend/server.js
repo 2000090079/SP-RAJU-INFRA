@@ -30,26 +30,26 @@ app.use(cors({
 app.use(express.json())
 
 /* ==============================
-   EMAIL CONFIG (DEBUG ENABLED)
+   EMAIL CONFIG (FIXED FOR RENDER)
 ================================ */
 
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
   console.error("❌ EMAIL_USER or EMAIL_PASS missing in .env")
 }
 
+// ✅ FIXED TRANSPORTER (NO MORE ETIMEDOUT)
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // IMPORTANT
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
   }
 })
 
 // 🔥 VERIFY SMTP CONNECTION
-transporter.verify((error, success) => {
+transporter.verify((error) => {
   if (error) {
     console.log("❌ SMTP Error:", error)
   } else {
@@ -110,7 +110,7 @@ app.post("/admin-login", (req, res) => {
 })
 
 /* ==============================
-   CONTACT FORM - DEBUG VERSION
+   CONTACT FORM - FINAL FIX
 ================================ */
 
 app.post("/send-enquiry", async (req, res) => {
@@ -142,10 +142,9 @@ app.post("/send-enquiry", async (req, res) => {
 
     console.log("✅ Email sent successfully:", info.response)
 
-    // Send success response ONLY after mail success
     res.status(200).json({ message: "Enquiry sent successfully" })
 
-    // 🔁 Auto reply (background)
+    // 🔁 Auto reply
     transporter.sendMail({
       from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -156,7 +155,7 @@ app.post("/send-enquiry", async (req, res) => {
         <p>Our team will get back to you shortly.</p>
       `
     }).then(() => {
-      console.log("📨 Auto-reply sent to user")
+      console.log("📨 Auto-reply sent")
     }).catch(err => {
       console.error("❌ Auto-reply failed:", err)
     })
