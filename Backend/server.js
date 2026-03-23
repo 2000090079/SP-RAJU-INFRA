@@ -30,7 +30,7 @@ app.use(cors({
 app.use(express.json())
 
 /* ==============================
-   EMAIL CONFIG (FIXED)
+   EMAIL CONFIG (DEBUG ENABLED)
 ================================ */
 
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -48,11 +48,12 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-transporter.verify((error) => {
+// 🔥 VERIFY SMTP CONNECTION
+transporter.verify((error, success) => {
   if (error) {
     console.log("❌ SMTP Error:", error)
   } else {
-    console.log("✅ SMTP Ready")
+    console.log("✅ SMTP Ready to send emails")
   }
 })
 
@@ -109,23 +110,25 @@ app.post("/admin-login", (req, res) => {
 })
 
 /* ==============================
-   CONTACT FORM - SEND EMAIL
+   CONTACT FORM - DEBUG VERSION
 ================================ */
 
 app.post("/send-enquiry", async (req, res) => {
 
+  console.log("➡️ Incoming request body:", req.body)
+
   const { name, email, message } = req.body
 
   if (!name || !email || !message) {
+    console.log("❌ Missing fields")
     return res.status(400).json({ message: "All fields are required" })
   }
 
   try {
 
-    console.log("📩 Enquiry received:", name)
+    console.log("📩 Enquiry received from:", name, "| Email:", email)
 
-    // Send admin mail
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       subject: "📩 New Enquiry - SP Raju Infra",
@@ -137,10 +140,12 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
-    // ✅ SEND RESPONSE IMMEDIATELY
+    console.log("✅ Email sent successfully:", info.response)
+
+    // Send success response ONLY after mail success
     res.status(200).json({ message: "Enquiry sent successfully" })
 
-    // Auto reply (background)
+    // 🔁 Auto reply (background)
     transporter.sendMail({
       from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -148,11 +153,16 @@ app.post("/send-enquiry", async (req, res) => {
       html: `
         <p>Hi ${name},</p>
         <p>Thank you for contacting SP Raju Infra.</p>
+        <p>Our team will get back to you shortly.</p>
       `
-    }).catch(err => console.error("Auto-reply failed:", err))
+    }).then(() => {
+      console.log("📨 Auto-reply sent to user")
+    }).catch(err => {
+      console.error("❌ Auto-reply failed:", err)
+    })
 
   } catch (err) {
-    console.error("❌ Email error:", err)
+    console.error("❌ EMAIL SEND FAILED:", err)
     res.status(500).json({ message: "Failed to send enquiry" })
   }
 
