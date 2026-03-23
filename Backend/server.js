@@ -1,8 +1,11 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
-const nodemailer = require("nodemailer")
 require("dotenv").config()
+
+/* 🔥 RESEND */
+const { Resend } = require("resend")
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 /* ROUTES */
 const projectRoutes = require("./routes/projects")
@@ -30,40 +33,20 @@ app.use(cors({
 app.use(express.json())
 
 /* ==============================
-   EMAIL CONFIG (FIXED FOR RENDER)
+   ENV CHECK
 ================================ */
 
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  console.error("❌ EMAIL_USER or EMAIL_PASS missing in .env")
+if (!process.env.RESEND_API_KEY) {
+  console.error("❌ RESEND_API_KEY missing in .env")
 }
-
-// ✅ FIXED TRANSPORTER (NO MORE ETIMEDOUT)
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // IMPORTANT
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-})
-
-// 🔥 VERIFY SMTP CONNECTION
-transporter.verify((error) => {
-  if (error) {
-    console.log("❌ SMTP Error:", error)
-  } else {
-    console.log("✅ SMTP Ready to send emails")
-  }
-})
-
-/* ==============================
-   MONGODB CONNECTION
-================================ */
 
 if (!process.env.MONGO_URI) {
   console.error("❌ MONGO_URI missing in .env")
 }
+
+/* ==============================
+   MONGODB CONNECTION
+================================ */
 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("✅ MongoDB Connected Successfully"))
@@ -110,7 +93,7 @@ app.post("/admin-login", (req, res) => {
 })
 
 /* ==============================
-   CONTACT FORM - FINAL FIX
+   CONTACT FORM (RESEND VERSION)
 ================================ */
 
 app.post("/send-enquiry", async (req, res) => {
@@ -128,9 +111,10 @@ app.post("/send-enquiry", async (req, res) => {
 
     console.log("📩 Enquiry received from:", name, "| Email:", email)
 
-    const info = await transporter.sendMail({
-      from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
+    // ✅ SEND EMAIL TO ADMIN
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev", // default working sender
+      to: process.env.EMAIL_USER, // your email
       subject: "📩 New Enquiry - SP Raju Infra",
       html: `
         <h3>New Enquiry Received</h3>
@@ -140,13 +124,13 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
-    console.log("✅ Email sent successfully:", info.response)
+    console.log("✅ Email sent:", response)
 
     res.status(200).json({ message: "Enquiry sent successfully" })
 
-    // 🔁 Auto reply
-    transporter.sendMail({
-      from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
+    // 🔁 AUTO REPLY (optional)
+    resend.emails.send({
+      from: "onboarding@resend.dev",
       to: email,
       subject: "We received your enquiry - SP Raju Infra",
       html: `
@@ -161,7 +145,7 @@ app.post("/send-enquiry", async (req, res) => {
     })
 
   } catch (err) {
-    console.error("❌ EMAIL SEND FAILED:", err)
+    console.error("❌ RESEND ERROR:", err)
     res.status(500).json({ message: "Failed to send enquiry" })
   }
 
