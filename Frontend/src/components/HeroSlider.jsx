@@ -3,7 +3,6 @@ import { useState, useEffect } from "react"
 function HeroSlider(){
 
 const images = [
-"/images/logo.png",
 "/images/dhanush emperor.jpg",
 "/images/dhanush enclave.jpg",
 "/images/dhanush residency.jpg",
