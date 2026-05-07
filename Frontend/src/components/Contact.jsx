@@ -64,7 +64,7 @@ return (
 </p>
 
 <p>
-📞 <strong>Phone:</strong> +91 7337245453
+📞 <strong>Phone:</strong> +91 8008780207
 </p>
 
 <p>
