@@ -56,22 +56,43 @@ return (
 
 {/* CONTACT INFO */}
 <div className="contact-info contact-box">
+
 <h3>Contact Information</h3>
-<p>🏢 <strong>Company:</strong> SP Raju Infra</p>
-<p>📞 <strong>Phone:</strong> +91 8008780207</p>
-<p>✉️ <strong>Email:</strong> sprajuinfra.co@gmail.com</p>
-<p>📍 <strong>Address:</strong> Rajahmundry, Andhra Pradesh</p>
+
+<p>
+🏢 <strong>Company:</strong> SP Raju Infra
+</p>
+
+<p>
+📞 <strong>Phone:</strong> +91 7337245453
+</p>
+
+<p>
+📞 <strong>Alternate:</strong> +91 9989245453
+</p>
+
+<p>
+✉️ <strong>Email:</strong> sprajuinfra.co@gmail.com
+</p>
+
+<p>
+📍 <strong>Address:</strong> Rajahmundry, Andhra Pradesh
+</p>
+
 </div>
 
 {/* GOOGLE MAP */}
 <div className="contact-map contact-box">
+
 <h3>Our Location</h3>
+
 <iframe
 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3815.335839088364!2d81.8083386!3d17.007189099999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a37a3c3ea7a174f%3A0x4deae3aa92df5bdf!2sSP%20RAJU%20INFRA%20Head%20office!5e0!3m2!1sen!2sin!4v1773479573238!5m2!1sen!2sin"
 title="SP Raju Infra Head Office"
 loading="lazy"
 allowFullScreen
 ></iframe>
+
 </div>
 
 {/* FORM */}
@@ -111,6 +132,22 @@ required
 <button type="submit" className="enquiry-btn">
 <span className="btn-text">Send Enquiry</span>
 </button>
+
+{/* WHATSAPP BUTTON */}
+
+<a
+href={`https://wa.me/917337245453?text=
+Hello%20SP%20Raju%20Infra,%0A%0A
+Name:%20${formData.name}%0A
+Email:%20${formData.email}%0A
+Message:%20${formData.message}
+`}
+target="_blank"
+rel="noopener noreferrer"
+className="whatsapp-btn"
+>
+WhatsApp Us
+</a>
 
 </form>
 
