@@ -1,0 +1,97 @@
+/* ============================================================
+   PUBLIC SITE STYLES — SP RAJU INFRA
+   Tailwind v4 WITHOUT Preflight.
+   Preflight is a global reset that would restyle the admin
+   dashboard. We skip it and scope our own minimal reset to
+   the .public-site wrapper instead. Admin CSS is unaffected.
+   ============================================================ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* ---------- Design tokens ---------- */
+@theme {
+  --color-ink: #0a1420;        /* near-black navy — hero, footer */
+  --color-navy: #1b263b;       /* existing brand color, kept */
+  --color-navy-soft: #24334e;
+  --color-brass: #c6a15b;      /* accent — lines, highlights, CTAs */
+  --color-brass-light: #e3c98f;
+  --color-sand: #f2efe9;       /* light section backgrounds */
+  --color-mist: #93a3b8;       /* muted text on dark */
+  --color-slate-body: #3d4a5c; /* body text on light */
+
+  --font-display: "Marcellus", Georgia, serif;
+  --font-body: "Manrope", system-ui, -apple-system, sans-serif;
+
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- Scoped base (replaces Preflight, public pages only) ---------- */
+@layer base {
+  .public-site,
+  .public-site *,
+  .public-site *::before,
+  .public-site *::after {
+    box-sizing: border-box;
+  }
+
+  .public-site {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--color-slate-body);
+    background: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .public-site h1,
+  .public-site h2,
+  .public-site h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    margin: 0;
+  }
+
+  .public-site p {
+    margin: 0;
+  }
+
+  .public-site img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .public-site button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .public-site a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Visible keyboard focus everywhere on the public site */
+  .public-site :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
