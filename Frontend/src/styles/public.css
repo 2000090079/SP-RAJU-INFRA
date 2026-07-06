@@ -95,3 +95,8 @@
     }
   }
 }
+
+/* Anchored sections clear the fixed navbar */
+.public-site section[id] {
+  scroll-margin-top: 84px;
+}
