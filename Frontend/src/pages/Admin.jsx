@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import "../styles/global.css"
 import "../styles/admin.css"
 
 function Admin() {
