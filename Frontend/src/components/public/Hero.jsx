@@ -21,11 +21,10 @@ const SLIDES = [
   { src: "/images/sai swarla.png", label: "Sai Swarla" },
 ]
 
-const SLIDE_MS = 6000
+const SLIDE_MS = 5000
 
 export default function Hero() {
   const [current, setCurrent] = useState(0)
-  const [paused, setPaused] = useState(false)
   const prefersReducedMotion = useReducedMotion()
   const sectionRef = useRef(null)
   const touchStartX = useRef(0)
@@ -49,12 +48,12 @@ export default function Hero() {
     []
   )
 
-  /* Autoplay — pauses on hover/focus, disabled for reduced motion */
+  /* Autoplay — always running, disabled only for reduced motion */
   useEffect(() => {
-    if (paused || prefersReducedMotion) return
+    if (prefersReducedMotion) return
     const id = setInterval(next, SLIDE_MS)
     return () => clearInterval(id)
-  }, [paused, prefersReducedMotion, next])
+  }, [prefersReducedMotion, next])
 
   /* Preload the next image so crossfades never flash */
   useEffect(() => {
@@ -86,10 +85,6 @@ export default function Hero() {
       aria-roledescription="carousel"
       aria-label="Featured SP Raju Infra projects"
       className="relative h-svh min-h-[560px] overflow-hidden bg-ink"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
       onKeyDown={onKeyDown}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -203,7 +198,7 @@ export default function Hero() {
                 key={current}
                 className="h-full bg-brass"
                 initial={{ scaleX: 0 }}
-                animate={{ scaleX: paused ? undefined : 1 }}
+                animate={{ scaleX: 1 }}
                 transition={{ duration: SLIDE_MS / 1000, ease: "linear" }}
                 style={{ transformOrigin: "left" }}
               />
