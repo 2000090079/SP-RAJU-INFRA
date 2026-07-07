@@ -19,8 +19,8 @@
   --color-brass: #c6a15b;      /* accent — lines, highlights, CTAs */
   --color-brass-light: #e3c98f;
   --color-sand: #f2efe9;       /* light section backgrounds */
-  --color-mist: #93a3b8;       /* muted text on dark */
-  --color-slate-body: #3d4a5c; /* body text on light */
+  --color-mist: #a9b8ca;       /* muted text on dark */
+  --color-slate-body: #33415a; /* body text on light */
 
   --font-display: "Marcellus", Georgia, serif;
   --font-body: "Manrope", system-ui, -apple-system, sans-serif;

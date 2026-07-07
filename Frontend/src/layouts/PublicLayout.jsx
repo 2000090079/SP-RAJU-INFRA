@@ -8,15 +8,31 @@ import "../styles/public.css"
 /* Because this layout is lazy-loaded, public.css is only ever
    downloaded on public routes — the admin bundle stays isolated. */
 
+/* Refresh should always land on the hero, so the very first load
+   takes manual control of scroll restoration and clears any
+   leftover #section hash. Hash scrolling still works for in-app
+   navigation after that. */
+let firstLoad = true
+
 function ScrollManager() {
   const { pathname, hash } = useLocation()
+
   useEffect(() => {
-    if (hash) {
+    if (firstLoad) {
+      firstLoad = false
+      window.history.scrollRestoration = "manual"
+      if (window.location.hash) {
+        window.history.replaceState(null, "", pathname + window.location.search)
+      }
+      window.scrollTo(0, 0)
+      return
+    }
+    if (hash && window.location.hash === hash) {
       // Allow the section to mount before scrolling to it
       requestAnimationFrame(() => {
         document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" })
       })
-    } else {
+    } else if (!hash) {
       window.scrollTo(0, 0)
     }
   }, [pathname, hash])

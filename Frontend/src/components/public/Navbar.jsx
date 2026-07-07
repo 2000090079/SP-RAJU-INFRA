@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 
 const LINKS = [
@@ -12,11 +12,7 @@ const LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-  const { pathname } = useLocation()
   const reduce = useReducedMotion()
-
-  /* Always solid on inner pages; transparent over the hero on home */
-  const solid = scrolled || pathname !== "/"
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -41,23 +37,19 @@ export default function Navbar() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
-        solid
-          ? "bg-ink/85 shadow-lg shadow-black/20 backdrop-blur-md"
-          : "bg-transparent"
+        scrolled
+          ? "bg-white/80 shadow-md shadow-navy/5 backdrop-blur-md"
+          : "bg-white shadow-sm"
       }`}
     >
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 py-3 sm:px-8 lg:px-12">
-        <Link to="/" aria-label="SP Raju Infra — home" className="flex items-center gap-3">
+        {/* Logo sits directly on the white bar — no chip, it merges */}
+        <Link to="/" aria-label="SP Raju Infra — home" className="shrink-0">
           <img
             src="/images/sprajulogo.png"
-            alt=""
-            width="44"
-            height="44"
-            className="h-11 w-11 rounded-full object-cover"
+            alt="SP Raju Infra"
+            className="h-9 w-auto object-contain sm:h-10"
           />
-          <span className="font-display text-lg tracking-wide text-white">
-            SP Raju <span className="text-brass-light">Infra</span>
-          </span>
         </Link>
 
         {/* Desktop links */}
@@ -66,14 +58,14 @@ export default function Navbar() {
             <Link
               key={l.label}
               to={l.to}
-              className="text-sm font-medium tracking-wide text-white/85 transition-colors duration-300 hover:text-brass-light"
+              className="text-sm font-semibold tracking-wide text-navy transition-colors duration-300 hover:text-brass"
             >
               {l.label}
             </Link>
           ))}
           <Link
             to="/#contact"
-            className="rounded-sm border border-brass px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-brass-light transition-colors duration-300 hover:bg-brass hover:text-ink"
+            className="rounded-sm border border-brass px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-navy transition-colors duration-300 hover:bg-brass hover:text-ink"
           >
             Enquire
           </Link>
@@ -81,7 +73,7 @@ export default function Navbar() {
 
         {/* Mobile toggle */}
         <button
-          className="grid h-11 w-11 place-items-center text-white md:hidden"
+          className="grid h-11 w-11 place-items-center text-navy md:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -107,7 +99,7 @@ export default function Navbar() {
             animate={reduce ? { opacity: 1 } : { opacity: 1, height: "auto" }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden bg-ink/95 backdrop-blur-md md:hidden"
+            className="overflow-hidden border-t border-navy/10 bg-white/95 backdrop-blur-md md:hidden"
           >
             <div className="flex flex-col gap-1 px-5 pb-6 pt-2">
               {LINKS.map((l, i) => (
@@ -120,7 +112,7 @@ export default function Navbar() {
                   <Link
                     to={l.to}
                     onClick={() => setOpen(false)}
-                    className="block border-b border-white/10 py-4 font-display text-xl text-white transition-colors hover:text-brass-light"
+                    className="block border-b border-navy/10 py-4 font-display text-xl text-navy transition-colors hover:text-brass"
                   >
                     {l.label}
                   </Link>
