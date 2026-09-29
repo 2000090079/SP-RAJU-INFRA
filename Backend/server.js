@@ -113,7 +113,7 @@ app.post("/send-enquiry", async (req, res) => {
     // ✅ SEND EMAIL TO ADMIN
     const { error } = await resend.emails.send({
       from: "onboarding@resend.dev",
-      to: process.env.EMAIL_USER,
+      to: "sprajuinfra.co@gmail.com",
       subject: "📩 New Enquiry - SP Raju Infra",
       html: `
         <h3>New Enquiry Received</h3>
