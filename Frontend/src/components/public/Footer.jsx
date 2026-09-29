@@ -14,9 +14,14 @@ export default function Footer() {
           </p>
           <p className="inline-flex items-center gap-1.5 rounded-sm bg-navy px-3.5 py-1.5 text-xs text-white/80 shadow-sm">
             Designed & developed by
-            <span className="font-display text-[13px] tracking-wide text-brass-light">
+            <a
+              href="https://www.linkedin.com/in/pendurthi-sri-teja-71778b20b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-display text-[13px] tracking-wide text-brass-light transition-colors hover:text-white"
+            >
               Pendurthi Sri Teja
-            </span>
+            </a>
           </p>
         </div>
       </div>

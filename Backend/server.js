@@ -105,7 +105,12 @@ app.post("/admin-login", (req, res) => {
 
 app.post("/send-enquiry", async (req, res) => {
 
-  console.log("➡️ Incoming request body:", req.body)
+  console.log("➡️ Incoming enquiry:", req.body)
+
+  if (!process.env.EMAIL_PASS || !process.env.EMAIL_USER) {
+    console.error("❌ EMAIL_USER or EMAIL_PASS not configured on server")
+    return res.status(500).json({ message: "Email service not configured. Please contact us directly." })
+  }
 
   const { name, email, message } = req.body
 
@@ -116,7 +121,7 @@ app.post("/send-enquiry", async (req, res) => {
 
   try {
 
-    console.log("📩 Enquiry received from:", name, "| Email:", email)
+    console.log("📩 Sending enquiry from:", name, "| Email:", email)
 
     // ✅ SEND EMAIL TO ADMIN
     await transporter.sendMail({
