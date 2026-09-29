@@ -24,14 +24,24 @@ export async function fetchProjects() {
  * Body: { name, email, message }
  */
 export async function sendEnquiry({ name, email, message }) {
-  const res = await fetch(`${BASE_URL}/send-enquiry`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, email, message }),
-  })
-  const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(data.message || "Failed to send enquiry")
-  return data
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 25000) // 25 s hard limit
+  try {
+    const res = await fetch(`${BASE_URL}/send-enquiry`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, message }),
+      signal: controller.signal,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(data.message || "Failed to send enquiry")
+    return data
+  } catch (err) {
+    if (err.name === "AbortError") throw new Error("Request timed out. Please try again.")
+    throw err
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 /**

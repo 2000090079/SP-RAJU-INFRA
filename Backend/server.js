@@ -6,13 +6,29 @@ require("dotenv").config()
 /* 📧 NODEMAILER */
 const nodemailer = require("nodemailer")
 
+// Port 465 (SSL) is more reliable than 587 (STARTTLS) on cloud hosts
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 })
+
+// Wraps sendMail with a hard 20-second deadline so the request never hangs
+function sendMailWithTimeout(options) {
+  return Promise.race([
+    transporter.sendMail(options),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Email timed out after 20s")), 20000)
+    ),
+  ])
+}
 
 /* ROUTES */
 const projectRoutes = require("./routes/projects")
@@ -124,7 +140,7 @@ app.post("/send-enquiry", async (req, res) => {
     console.log("📩 Sending enquiry from:", name, "| Email:", email)
 
     // ✅ SEND EMAIL TO ADMIN
-    await transporter.sendMail({
+    await sendMailWithTimeout({
       from: `"SP Raju Infra Website" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       subject: "📩 New Enquiry - SP Raju Infra",
@@ -141,7 +157,7 @@ app.post("/send-enquiry", async (req, res) => {
     res.status(200).json({ message: "Enquiry sent successfully" })
 
     // 🔁 AUTO REPLY
-    transporter.sendMail({
+    sendMailWithTimeout({
       from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "We received your enquiry - SP Raju Infra",
