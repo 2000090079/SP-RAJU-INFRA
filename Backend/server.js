@@ -3,32 +3,9 @@ const mongoose = require("mongoose")
 const cors = require("cors")
 require("dotenv").config()
 
-/* 📧 NODEMAILER */
-const nodemailer = require("nodemailer")
-
-// Port 465 (SSL) is more reliable than 587 (STARTTLS) on cloud hosts
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
-})
-
-// Wraps sendMail with a hard 20-second deadline so the request never hangs
-function sendMailWithTimeout(options) {
-  return Promise.race([
-    transporter.sendMail(options),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Email timed out after 20s")), 20000)
-    ),
-  ])
-}
+/* 📧 RESEND — HTTP API, works on Render (SMTP is blocked on free tier) */
+const { Resend } = require("resend")
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 /* ROUTES */
 const projectRoutes = require("./routes/projects")
@@ -59,8 +36,8 @@ app.use(express.json())
    ENV CHECK
 ================================ */
 
-if (!process.env.EMAIL_PASS) {
-  console.error("❌ EMAIL_PASS missing in .env")
+if (!process.env.RESEND_API_KEY) {
+  console.error("❌ RESEND_API_KEY missing — enquiry emails will fail")
 }
 
 if (!process.env.MONGO_URI) {
@@ -123,15 +100,9 @@ app.post("/send-enquiry", async (req, res) => {
 
   console.log("➡️ Incoming enquiry:", req.body)
 
-  if (!process.env.EMAIL_PASS || !process.env.EMAIL_USER) {
-    console.error("❌ EMAIL_USER or EMAIL_PASS not configured on server")
-    return res.status(500).json({ message: "Email service not configured. Please contact us directly." })
-  }
-
   const { name, email, message } = req.body
 
   if (!name || !email || !message) {
-    console.log("❌ Missing fields")
     return res.status(400).json({ message: "All fields are required" })
   }
 
@@ -140,8 +111,8 @@ app.post("/send-enquiry", async (req, res) => {
     console.log("📩 Sending enquiry from:", name, "| Email:", email)
 
     // ✅ SEND EMAIL TO ADMIN
-    await sendMailWithTimeout({
-      from: `"SP Raju Infra Website" <${process.env.EMAIL_USER}>`,
+    const { error } = await resend.emails.send({
+      from: "onboarding@resend.dev",
       to: process.env.EMAIL_USER,
       subject: "📩 New Enquiry - SP Raju Infra",
       html: `
@@ -152,13 +123,17 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
-    console.log("✅ Email sent to admin")
+    if (error) {
+      console.error("❌ Resend error:", error)
+      return res.status(500).json({ message: "Failed to send enquiry" })
+    }
 
+    console.log("✅ Enquiry email sent")
     res.status(200).json({ message: "Enquiry sent successfully" })
 
-    // 🔁 AUTO REPLY
-    sendMailWithTimeout({
-      from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
+    // 🔁 AUTO REPLY (fire-and-forget)
+    resend.emails.send({
+      from: "onboarding@resend.dev",
       to: email,
       subject: "We received your enquiry - SP Raju Infra",
       html: `
@@ -166,14 +141,10 @@ app.post("/send-enquiry", async (req, res) => {
         <p>Thank you for contacting SP Raju Infra.</p>
         <p>Our team will get back to you shortly.</p>
       `
-    }).then(() => {
-      console.log("📨 Auto-reply sent")
-    }).catch(err => {
-      console.error("❌ Auto-reply failed:", err)
-    })
+    }).catch(err => console.error("❌ Auto-reply failed:", err))
 
   } catch (err) {
-    console.error("❌ RESEND ERROR:", err)
+    console.error("❌ Enquiry error:", err)
     res.status(500).json({ message: "Failed to send enquiry" })
   }
 
