@@ -37,7 +37,7 @@ function onYTReady(cb) {
 
    The hook replaces the <div> that divRef points to with an <iframe>.
 ──────────────────────────────────────────────────────────────────────────── */
-export function useYouTubePlayer(containerRef, videoId) {
+export function useYouTubePlayer(containerRef, videoId, shouldLoad = false) {
   const playerRef = useRef(null)
   const autoplayTimerRef = useRef(null)
 
@@ -46,7 +46,7 @@ export function useYouTubePlayer(containerRef, videoId) {
   const [autoplayFailed, setAutoplayFailed] = useState(false)
 
   useEffect(() => {
-    if (!containerRef.current || !videoId) return
+    if (!shouldLoad || !containerRef.current || !videoId) return
 
     let destroyed = false
 
@@ -92,7 +92,7 @@ export function useYouTubePlayer(containerRef, videoId) {
       setMuted(true)
       setAutoplayFailed(false)
     }
-  }, [videoId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [videoId, shouldLoad]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const play = useCallback(() => {
     if (!playerRef.current) return

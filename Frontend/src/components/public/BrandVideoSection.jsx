@@ -63,9 +63,9 @@ export default function BrandVideoSection() {
   /* ── Observer 2: play/pause — fire at 50 % visibility */
   const [playRef, isVisible] = useIntersectionObserver({ threshold: 0.5 })
 
-  /* ── YouTube player (only wires up once shouldLoad becomes true) */
+  /* ── YouTube player — initialises once shouldLoad becomes true */
   const { ready, muted, autoplayFailed, play, pause, toggleMute, forcePlay } =
-    useYouTubePlayer(shouldLoad ? playerDivRef : { current: null }, VIDEO_ID)
+    useYouTubePlayer(playerDivRef, VIDEO_ID, shouldLoad)
 
   /* ── Drive play / pause from viewport visibility ───────────────────── */
   useEffect(() => {
