@@ -1,5 +1,6 @@
 import Seo from "../components/public/Seo"
 import Hero from "../components/public/Hero"
+import BrandVideoSection from "../components/public/BrandVideoSection"
 import Stats from "../components/public/Stats"
 import About from "../components/public/About"
 import ProjectsGrid from "../components/public/ProjectsGrid"
@@ -18,6 +19,7 @@ export default function Home() {
         jsonLd={organizationJsonLd()}
       />
       <Hero />
+      <BrandVideoSection />
       <Stats />
       <About />
       <ProjectsGrid />

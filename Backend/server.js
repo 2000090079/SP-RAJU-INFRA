@@ -3,9 +3,16 @@ const mongoose = require("mongoose")
 const cors = require("cors")
 require("dotenv").config()
 
-/* 🔥 RESEND */
-const { Resend } = require("resend")
-const resend = new Resend(process.env.RESEND_API_KEY)
+/* 📧 NODEMAILER */
+const nodemailer = require("nodemailer")
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+})
 
 /* ROUTES */
 const projectRoutes = require("./routes/projects")
@@ -36,8 +43,8 @@ app.use(express.json())
    ENV CHECK
 ================================ */
 
-if (!process.env.RESEND_API_KEY) {
-  console.error("❌ RESEND_API_KEY missing in .env")
+if (!process.env.EMAIL_PASS) {
+  console.error("❌ EMAIL_PASS missing in .env")
 }
 
 if (!process.env.MONGO_URI) {
@@ -112,9 +119,9 @@ app.post("/send-enquiry", async (req, res) => {
     console.log("📩 Enquiry received from:", name, "| Email:", email)
 
     // ✅ SEND EMAIL TO ADMIN
-    const response = await resend.emails.send({
-      from: "onboarding@resend.dev", // default working sender
-      to: process.env.EMAIL_USER, // your email
+    await transporter.sendMail({
+      from: `"SP Raju Infra Website" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
       subject: "📩 New Enquiry - SP Raju Infra",
       html: `
         <h3>New Enquiry Received</h3>
@@ -124,13 +131,13 @@ app.post("/send-enquiry", async (req, res) => {
       `
     })
 
-    console.log("✅ Email sent:", response)
+    console.log("✅ Email sent to admin")
 
     res.status(200).json({ message: "Enquiry sent successfully" })
 
-    // 🔁 AUTO REPLY (optional)
-    resend.emails.send({
-      from: "onboarding@resend.dev",
+    // 🔁 AUTO REPLY
+    transporter.sendMail({
+      from: `"SP Raju Infra" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "We received your enquiry - SP Raju Infra",
       html: `
