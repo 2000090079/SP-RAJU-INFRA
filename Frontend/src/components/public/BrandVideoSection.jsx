@@ -138,13 +138,11 @@ export default function BrandVideoSection() {
               />
             )}
 
-            {/* YouTube player div — IFrame API replaces this element */}
-            {shouldLoad && (
-              <div
-                ref={playerDivRef}
-                className="absolute inset-0 w-full h-full"
-              />
-            )}
+            {/* Stable outer div owned by React — YouTube replaces the
+                inner div with an <iframe>; React never touches it directly */}
+            <div className="absolute inset-0 w-full h-full">
+              <div ref={playerDivRef} className="w-full h-full" />
+            </div>
 
             {/* Loading shimmer over thumbnail while player initialises */}
             {shouldLoad && !ready && (
