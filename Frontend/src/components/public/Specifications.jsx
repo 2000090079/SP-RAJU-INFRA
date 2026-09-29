@@ -74,7 +74,7 @@ function SpecItem({ spec, index, open, onToggle }) {
 }
 
 export default function Specifications() {
-  const [openItems, setOpenItems] = useState([0])
+  const [openItems, setOpenItems] = useState([])
   const toggle = (i) =>
     setOpenItems((prev) =>
       prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]
