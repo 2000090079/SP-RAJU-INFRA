@@ -4,7 +4,7 @@ import Reveal from "./Reveal"
 
 /* Figures preserved exactly from the previous site */
 const STATS = [
-  { value: 25, suffix: "+", text: "Residential & Commercial Projects Delivered" },
+  { value: 40, suffix: "+", text: "Residential & Commercial Projects Delivered" },
   { value: 20, suffix: "+", text: "Years of Industry Experience" },
   { value: 150000, suffix: "+", text: "Square Feet Completed" },
   { value: 20000, suffix: "+", text: "Square Feet Under Development" },
@@ -28,7 +28,7 @@ function Counter({ value, suffix }) {
   }, [inView, value, reduce])
 
   return (
-    <span ref={ref} className="font-display text-4xl text-brass-light sm:text-5xl">
+    <span ref={ref} className="font-display text-3xl text-brass-light sm:text-4xl lg:text-[2.6rem]">
       {(reduce ? value : display).toLocaleString("en-IN")}
       {suffix}
     </span>
@@ -45,7 +45,7 @@ export default function Stats() {
             Our impact
           </p>
         </Reveal>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-6">
           {STATS.map((s, i) => (
             <Reveal key={s.text} delay={i * 0.08}>
               <div className="border-l border-white/10 pl-4">
